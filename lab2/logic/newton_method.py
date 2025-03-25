@@ -24,6 +24,8 @@ def calculate(f, x, eps=properties.def_eps):
 
 
 def calculate_system(f, x0, y0, eps=properties.def_eps, max_iter=properties.max_iter):
+    if(x0==0):
+        x0 = 0.01
     errors = []
     for iteration in range(max_iter):
         f_x = [func(x0, y0) for func in f]
@@ -49,7 +51,7 @@ def calculate_system(f, x0, y0, eps=properties.def_eps, max_iter=properties.max_
 
         x0, y0 = x1, y1
 
-    return x0, y0, max_iter, errors, J_x
+    return 0, 0, max_iter, [(0,0)], J_x
 
 
 def solve_linear_system(J_x, f_x):

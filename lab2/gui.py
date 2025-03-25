@@ -8,7 +8,17 @@ import logic.properties as properties
 import os
 import glob
 
+
 def main(page):
+    def format_output(method_name, f, x, iters):
+        if f == 0 and x == 0 and iters == 0:
+            return f"{method_name}: не сошлось за максимально кол-во итераций\n\n"
+        else:
+            return (f"{method_name}:\n"
+                    f"Итераций: {iters}\n"
+                    f"x = {x:.6f}\n"
+                    f"f(x) = {f:.6f}\n\n")
+
     page.window_height = 1000
     page.title = "Алхимовици Арсений  | P3210 | Лаб2"
     page.theme_mode = ft.ThemeMode.LIGHT
@@ -38,20 +48,12 @@ def main(page):
         b_value = input_check(b.value)
         c_value = input_check(c.value)
         f_chord, x_chord, iters_chord = logic.chord_method.calculate(fun, a_value, b_value, c_value)
-        f_newton, x_newton, iters_newton = logic.newton_method.calculate(fun, (a_value+b_value)/2, c_value)
+        f_newton, x_newton, iters_newton = logic.newton_method.calculate(fun, (a_value + b_value) / 2, c_value)
         f_simple, x_simple, iters_simple = logic.simple_iteration_method.calculate(fun, a_value, b_value, c_value)
-        output = f"Метод хорд:\n" \
-                 f"Итераций: {iters_chord}\n" \
-                 f"x = {x_chord:.6f}\n" \
-                 f"f(x) = {f_chord:.6f}\n\n" \
-                 f"Метод Ньютона:\n" \
-                 f"Итераций: {iters_newton}\n" \
-                 f"x = {x_newton:.6f}\n" \
-                 f"f(x) = {f_newton:.6f}\n\n" \
-                 f"Метод простой итерации:\n" \
-                 f"Итераций: {iters_simple}\n" \
-                 f"x = {x_simple:.6f}\n" \
-                 f"f(x) = {f_simple:.6f}\n\n"
+
+        output = format_output("Метод хорд", f_chord, x_chord, iters_chord) + \
+                 format_output("Метод Ньютона", f_newton, x_newton, iters_newton) + \
+                 format_output("Метод простой итерации", f_simple, x_simple, iters_simple)
 
         t.value = output
 
@@ -63,7 +65,7 @@ def main(page):
             except Exception as e:
                 pass
 
-        properties.img_i +=1
+        properties.img_i += 1
         plot.makeplot(fun, a_value, b_value)
         graph_image.src = f"./graph{properties.img_i}.png"
         graph_image.update()
@@ -84,13 +86,18 @@ def main(page):
 
         x, y, max_iter, errors, jacobian_matrix = logic.newton_method.calculate_system(fun, x_value, y_value, eps_value)
 
-        output = f"Метод Ньютона:\n" \
-                 f"Матрица Якоба: {jacobian_matrix}\n" \
-                 f"Итераций: {max_iter}\n" \
-                 f"x = {x:.6f}, y = {y:.6f}\n" \
-                 f"Вектор погрешности: \n"
-        error_str = "".join([f"Итерация {i}: [Δx={dx:.6f}, Δy={dy:.6f}]\n" for i, (dx, dy) in enumerate(errors, 1)])
-        output += error_str
+        if(max_iter==properties.max_iter or max_iter==0):
+            output = f"Метод Ньютона:\n" \
+                     f"Матрица Якоба: {jacobian_matrix}\n" \
+                     f"Метод не сошелся\n"
+        else:
+            output = f"Метод Ньютона:\n" \
+                     f"Матрица Якоба: {jacobian_matrix}\n" \
+                     f"Итераций: {max_iter}\n" \
+                     f"x = {x:.6f}, y = {y:.6f}\n" \
+                     f"Вектор погрешности: \n"
+            error_str = "".join([f"Итерация {i}: [Δx={dx:.6f}, Δy={dy:.6f}]\n" for i, (dx, dy) in enumerate(errors, 1)])
+            output += error_str
 
         t2.value = output
 

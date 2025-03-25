@@ -10,14 +10,15 @@ def calculate(f, a, b, eps=properties.def_eps):
 
     if (max_df == 0):
         return 0,0,0
-    else:
+    elif (df_a > 0 and df_b > 0):
+        lamda = -1 / max_df
+    elif (df_a < 0 and df_b < 0):
         lamda = 1 / max_df
-        current_x = (a + b) / 2
 
-    if df(current_x) > 0:
-        lamda = -lamda
+    current_x = (a + b) / 2
 
     for i in range(properties.max_iter):
+        print(current_x)
         f_c = f(current_x)
         next_x = current_x + lamda * f_c
         if (abs(next_x - current_x) < eps):
