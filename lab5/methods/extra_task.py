@@ -2,7 +2,7 @@ from tools.math_tools import *
 
 
 def stirling(pol_xs, pol_ys, x):
-    """Схема Стирлинга для равноотстоящих узлов"""
+    """Схема Стирлинга"""
     n = len(pol_xs) - 1
     mid = n // 2
     diffs = finite_diff_table(pol_ys)
@@ -22,7 +22,7 @@ def stirling(pol_xs, pol_ys, x):
 
 
 def bessel(pol_xs, pol_ys, x):
-    """Схема Бесселя для равноотстоящих узлов"""
+    """Схема Бесселя"""
     n = len(pol_xs) - 1
     mid = n // 2
     diffs = finite_diff_table(pol_ys)
