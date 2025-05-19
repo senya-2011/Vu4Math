@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Результаты{% endblock %}
+{% block content %}
+<h1>Интерполяция для x = {{ x0 }}</h1>
+
+<div class="mb-4">
+  <a href="{{ url_for('download_report') }}" class="btn btn-success">Скачать отчет</a>
+  <a href="{{ url_for('index') }}" class="btn btn-secondary">Новая задача</a>
+</div>
+
+<!-- Комбинированный график -->
+<div class="card mb-4">
+  <div class="card-header">Все методы сразу</div>
+  <div class="card-body">
+    <img src="{{ url_for('get_temp_image', data_id=data_id, filename='combined.png') }}">
+  </div>
+</div>
+
+<!-- Таблица разностей -->
+{% if diff_table %}
+  <h2>Таблица конечных разностей</h2>
+  <table class="table table-striped mb-4">
+    <thead>
+      <tr>{% for j in range(diff_table|length) %}<th>Δ{{ j }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in diff_table %}
+      <tr>{% for v in row %}<td>{{ '%.4f'|format(v) }}</td>{% endfor %}</tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+<!-- Таблица результатов -->
+<table class="table table-bordered mb-4">
+  <thead class="table-light">
+    <tr><th>Метод</th><th>t</th><th>P(x)</th></tr>
+  </thead>
+  <tbody>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.name }}</td>
+      <td>{{ r.t is not none and '%.3f'|format(r.t) or '-' }}</td>
+      <td>{{ r.p is not none and '%.6f'|format(r.p) or 'Ошибка' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Навигация по методам -->
+<ul class="nav nav-tabs mb-3" id="methodTabs" role="tablist">
+  {% for r in results %}
+  <li class="nav-item">
+    <button class="nav-link {% if loop.first %}active{% endif %}"
+            data-bs-toggle="tab"
+            data-bs-target="#tab-{{ loop.index }}">
+      {{ r.name }}
+    </button>
+  </li>
+  {% endfor %}
+</ul>
+
+<div class="tab-content">
+  {% for r in results %}
+  <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ loop.index }}">
+    <div class="card mb-4">
+      <div class="card-header">{{ r.name }}</div>
+      <div class="card-body">
+        {% set safe_name = r.name|replace(' ', '_')|urlencode %}
+        <img src="{{ url_for('get_temp_image', data_id=data_id, filename=r.name+ '.png') }}">
+        <div class="mt-3">
+          <p><strong>P(x) = </strong>{{ '%.6f'|format(r.p) if r.p is not none else 'Ошибка' }}</p>
+          <p><strong>t = </strong>{{ r.t is not none and '%.3f'|format(r.t) or '-' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
