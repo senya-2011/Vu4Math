@@ -25,7 +25,10 @@ def plot_interpolation(xs, ys, x_val, methods_dict, num_points=500):
         try:
             poly, t = func(xs, ys, x_val)
             y_interp = [poly(x) for x in x_vals]
-            ax.plot(x_vals, y_interp, label=f"{name} (t={t:.3f})")
+            if t!=None:
+                ax.plot(x_vals, y_interp, label=f"{name} (t={t:.3f})")
+            else:
+                ax.plot(x_vals, y_interp, label=f"{name}")
         except Exception as e:
             print(f"Error plotting {name}: {str(e)}")
             continue

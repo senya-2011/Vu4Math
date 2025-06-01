@@ -9,19 +9,21 @@ import tools.plot_tool as plot_utils
 
 def lagrange(xs, ys, x0):
     # Для Лагранжа t = (x0 - x1) / h, где h = xs[1]-xs[0]
-    if len(xs) > 1:
-        h = xs[1] - xs[0]
-        t = (x0 - xs[0]) / h if h != 0 else None
-    else:
-        t = None
+    # if len(xs) > 1:
+    #     h = xs[1] - xs[0]
+    #     t = (x0 - xs[0]) / h if h != 0 else None
+    # else:
+    #     t = None
+    t = None
     def poly(x): return langrange.lagrange(xs, ys, x)
     return poly, t
 
 
 def newton_divided(xs, ys, x0):
     # стандартная разделённая разность, t относительна первого узла
-    h = xs[1] - xs[0]
-    t = (x0 - xs[0]) / h if h != 0 else None
+    #h = xs[1] - xs[0]
+    #t = (x0 - xs[0]) / h if h != 0 else None
+    t = None
     def poly(x): return newton.newton_divided(xs, ys, x)
     return poly, t
 

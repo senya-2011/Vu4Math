@@ -5,7 +5,7 @@ from solution import (
     gauss_forward, gauss_backward, stirling, bessel, make_plot, GENERATORS
 )
 from tools.file_reader import read_xy_from_txt_filepath
-from tools.math_tools import finite_diff_table
+from tools.math_tools import finite_diff_table, is_uniform
 import tools.plot_tool as plot_utils
 import os
 import io
@@ -25,8 +25,8 @@ METHODS = {
     'Ньютона (разд. разн.)': newton_divided,
     'Ньютона (прям. кон. разн.)': newton_forward,
     'Ньютона (обр. кон. разн.)': newton_backward,
-    'Гаусса (вперёд)': gauss_forward,
-    'Гаусса (назад)': gauss_backward,
+    # 'Гаусса (вперёд)': gauss_forward,
+    # 'Гаусса (назад)': gauss_backward,
     'Стирлинга': stirling,
     'Бесселя': bessel
 }
@@ -124,10 +124,11 @@ def index():
 
             for name in sel:
                 func = METHODS[name]
-                poly, t = func(x_vals, y_vals, x0)
-                p = poly(x0) if poly else None
-                results.append({'name': name, 't': t, 'p': p})
-                methods_used[name] = func
+                if (len(x_vals) % 2 == 0 and name!='Стирлинга') or (len(x_vals) % 2 == 1 and name!='Бесселя'):
+                    poly, t = func(x_vals, y_vals, x0)
+                    p = poly(x0) if poly else None
+                    results.append({'name': name, 't': t, 'p': p})
+                    methods_used[name] = func
 
             # Генерация и сохранение графиков
             fig = make_plot(x_vals, y_vals, x0, methods_used)
