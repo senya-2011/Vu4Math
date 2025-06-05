@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Результаты{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Результаты вычислений</h1>
+
+<div class="mb-4">
+  <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">Новая задача</a>
+  <form action="{{ url_for('download_report') }}" method="post" style="display: inline;">
+    <input type="hidden" name="report_content" value="{{ report_text }}">
+    <button type="submit" class="btn btn-success">Скачать отчёт (TXT)</button>
+  </form>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Выбранная ОДУ</h5>
+    <p class="card-text">{{ ode_desc }}</p>
+    <h5 class="card-title">Параметры</h5>
+    <p class="card-text">x₀ = {{ x0 }}, y₀ = {{ y0 }}, xₙ = {{ xn }}, h = {{ h }}, eps = {{ eps }}</p>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Оценки погрешностей методов</div>
+  <div class="card-body">
+    <ul class="list-group">
+      {% for ys, label, err_val, status in solutions %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          {{ label }}
+          <span class="badge bg-{{ status }} rounded-pill">
+            {{ "%.10f"|format(err_val) }}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="card mb-4">
+  <div class="card-header">Общий график всех методов</div>
+  <div class="card-body text-center">
+    <img src="data:image/png;base64,{{ combined_graph }}" alt="Combined Graph" class="img-fluid border">
+  </div>
+</div>
+
+<h3 class="mb-3">Общая таблица</h3>
+<div class="table-responsive mb-4">
+  <table class="table table-bordered table-striped align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>x</th>
+        {% for ys, label, err_val, status in solutions %}
+          <th>{{ label }}</th>
+        {% endfor %}
+        <th>Exact</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in combined_rows %}
+      <tr>
+        <td>{{ row.x }}</td>
+        {% for ys, label, err_val, status in solutions %}
+          <td>{{ row[label] }}</td>
+        {% endfor %}
+        <td>{{ row.exact }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<ul class="nav nav-tabs mb-3" id="methodTabs" role="tablist">
+  {% for pm in per_method %}
+  <li class="nav-item" role="presentation">
+    <button class="nav-link {% if loop.first %}active{% endif %}"
+            id="tab-{{ loop.index0 }}-tab"
+            data-bs-toggle="tab"
+            data-bs-target="#tab-{{ loop.index0 }}"
+            type="button"
+            role="tab">
+      {{ pm.label }}
+    </button>
+  </li>
+  {% endfor %}
+</ul>
+
+<div class="tab-content">
+  {% for pm in per_method %}
+  <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="tab-{{ loop.index0 }}" role="tabpanel">
+    <div class="card mb-4">
+      <div class="card-header">{{ pm.label }}: график и таблица</div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6>Погрешность метода:
+            <span class="badge bg-{{ pm.error_status }}">
+              {{ "%.6f"|format(pm.error_value) }}
+            </span>
+          </h6>
+        </div>
+        <div class="text-center mb-3">
+          <img src="data:image/png;base64,{{ pm.graph }}" alt="{{ pm.label }} Graph" class="img-fluid border">
+        </div>
+        <h5>Таблица для {{ pm.label }}</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>x</th>
+                <th>y_num</th>
+                <th>y_exact</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for xval, yval, yex in pm.rows %}
+              <tr>
+                <td>{{ xval }}</td>
+                <td>{{ yval }}</td>
+                <td>{{ yex }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}
