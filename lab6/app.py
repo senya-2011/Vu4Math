@@ -38,6 +38,16 @@ def ode3():
     desc = "y' = x*(1 - x)"
     return f, exact, desc
 
+def ode4():
+    def f(x, y):
+        return y + (1+x)*y*y
+    def exact(x, x0, y0):
+        C = (1 + x0 * y0) * math.exp(x0) / y0  # Константа интегрирования
+        return 1 / (C * math.exp(-x) - x)  # Решение y(x)
+    desc = "y' = y + (1 + x)y^2"
+    return f, exact, desc
+
+
 def choose_ode(ode_choice):
     if ode_choice == '1':
         return ode1()
@@ -45,6 +55,8 @@ def choose_ode(ode_choice):
         return ode2()
     elif ode_choice == '3':
         return ode3()
+    elif ode_choice == '4':
+        return ode4()
     else:
         return ode1()
 
@@ -67,11 +79,10 @@ def results():
     x0 = convert_to_float(request.form.get('x0', '0.0'))
     y0 = convert_to_float(request.form.get('y0', '1.0'))
     xn = convert_to_float(request.form.get('xn', '1.0'))
-    h  = convert_to_float(request.form.get('h', '0.1'))
+    h = convert_to_float(request.form.get('h', '0.1'))
     eps = convert_to_float(request.form.get('eps', '0.01'))
     methods = request.form.getlist('methods')
 
-    # Валидация входных данных
     if h <= 0:
         return render_template('error.html', message="Шаг h должен быть положительным и отличным от нуля.")
     if x0 > xn:
@@ -114,7 +125,6 @@ def results():
             status = 'success' if max_err <= eps else 'danger'
             solutions.append((ys_ad, "Адамс", max_err, status))
 
-    # Общий график
     fig = plt.figure()
     plt.plot(xs, ys_exact, linestyle='-', color='black', label='Точное')
     markers = ['o', 's', '^']
@@ -145,15 +155,15 @@ def results():
 
     combined_rows = []
     for i, xi in enumerate(xs):
-        row = {'x': f"{xi:.3f}"}
-        row_list = [f"{xi:<8.3f}"]
+        row = {'x': f"{xi:.6f}"}
+        row_list = [f"{xi:<8.6f}"]
         for ys_num, label, _, _ in solutions:
-            val = f"{ys_num[i]:<12.3f}"
+            val = f"{ys_num[i]:<12.6f}"
             row_list.append(val)
-            row[label] = f"{ys_num[i]:.3f}"
-        exact_val_formatted = f"{ys_exact[i]:<12.3f}"
+            row[label] = f"{ys_num[i]:.6f}"
+        exact_val_formatted = f"{ys_exact[i]:<12.6f}"
         row_list.append(exact_val_formatted)
-        row['exact'] = f"{ys_exact[i]:.3f}"
+        row['exact'] = f"{ys_exact[i]:.6f}"
         combined_rows.append(row)
         report_lines.append(" | ".join(row_list))
 
@@ -180,7 +190,7 @@ def results():
 
         rows = []
         for i, xi in enumerate(xs):
-            rows.append((f"{xi:.3f}", f"{ys_num[i]:.3f}", f"{ys_exact[i]:.3f}"))
+            rows.append((f"{xi:.6f}", f"{ys_num[i]:.6f}", f"{ys_exact[i]:.6f}"))
 
         per_method.append({
             'label': label,
